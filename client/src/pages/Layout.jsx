@@ -3,7 +3,7 @@ import React, { useState } from 'react'
 import { Outlet } from 'react-router-dom'
 import {dummyUserData} from '../assets/assets'
 import Sidebar from '../components/Sidebar'
-import { Loading } from '../components/Loading'
+import {Loading} from '../components/Loading'
 
 const Layout = () => {
   const user = dummyUserData;
