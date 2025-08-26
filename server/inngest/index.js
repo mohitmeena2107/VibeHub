@@ -44,7 +44,7 @@ const syncUserUpdation = inngest.createFunction(
         full_name:first_name+" "+last_name,
         profile_picture:image_url,
     }
-    await User.findOneAndUpdate(id,updatedUserdata)
+    await User.findByIdAndUpdate(id,updatedUserdata)
   },
 )
 
