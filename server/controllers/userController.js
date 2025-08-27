@@ -1,4 +1,4 @@
-import { Connection } from "mongoose";
+import Connection from "../models/Connection.js";
 import imagekit from "../config/imagekit.js";
 import { User } from "../models/User.js";
 import fs from "fs";
