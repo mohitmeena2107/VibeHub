@@ -22,7 +22,7 @@ app.use("/api/inngest", serve({ client: inngest, functions }))
 app.use("/api/v1/user", userRouter)
 app.use("/api/v1/post", postRouter)
 app.use("/api/v1/story", storyRouter)
-app.use("/api/v1/message", messageRouterRouter)
+app.use("/api/v1/message", messageRouter)
 
 
 
