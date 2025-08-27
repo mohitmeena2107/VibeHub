@@ -135,6 +135,8 @@ const deleteStory = inngest.createFunction(
 const sendNotificationOfUnseenMessages = inngest.createFunction(
   {
     id: "send-unseen-messages-notification",
+  },
+  {
     cron: "TZ=America/New_York 0 9 * * *",
   }, // Every Day 9 AM
   async ({ step }) => {
@@ -159,12 +161,12 @@ const sendNotificationOfUnseenMessages = inngest.createFunction(
                     </div>`;
 
       await sendEmail({
-        to:user.email,
-        subject,body
-      })
-
+        to: user.email,
+        subject,
+        body,
+      });
     }
-    return {message:'Notification Sent'}
+    return { message: "Notification Sent" };
   }
 );
 
@@ -175,5 +177,5 @@ export const functions = [
   syncUserDeletion,
   sendNewConnectionRequestReminder,
   deleteStory,
-  sendNotificationOfUnseenMessages
+  sendNotificationOfUnseenMessages,
 ];
