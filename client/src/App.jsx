@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 import { Route, Routes } from 'react-router-dom'
 import Login from './pages/Login'
 import Feed from './pages/Feed'
@@ -10,7 +10,8 @@ import Discover from './pages/Discover'
 import Profile from './pages/Profile'
 import { useAuth, useUser } from '@clerk/clerk-react'
 import Layout from './pages/Layout'
-import { useEffect } from 'react'
+import { Toaster } from 'react-hot-toast'
+
 
 const App = () => {
   const {user} = useUser()
@@ -23,6 +24,7 @@ const App = () => {
     },[user])
   return (
     <>
+      <Toaster />
       <Routes>
         <Route path="/" element={ !user ?<Login/>:<Layout/>}>
           <Route index element = {<Feed/>} />
