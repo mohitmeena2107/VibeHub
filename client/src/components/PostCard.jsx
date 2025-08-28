@@ -2,6 +2,7 @@ import React, {useState} from "react";
 import { BadgeCheck, Heart, MessageCircle, Share2 } from "lucide-react";
 import moment from "moment";
 import { dummyUserData } from "../assets/assets";
+import { useSelector } from "react-redux";
 
 const PostCard = ({ post }) => {
   const postWithHashtags = post.content.replace(
@@ -9,7 +10,11 @@ const PostCard = ({ post }) => {
     '<span class="text-indigo-600">$1</span>'
   );
   const [likes, setLikes] = useState(post.likes_count);
-  const currentUser = dummyUserData;
+
+
+  const currentUser = useSelector((state)=>{
+    return state.user.value
+  });
   const handleLike = async () => {
 
   }

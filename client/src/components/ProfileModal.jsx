@@ -1,9 +1,18 @@
 import React, { useState } from "react";
+import { useAuth } from "@clerk/clerk-react";
 import { dummyUserData } from "../assets/assets";
 import { Pencil } from "lucide-react";
+import { useDispatch, useSelector } from "react-redux";
+import { updateUser } from "../features/users/userSlice";
+import toast from "react-hot-toast";
 
 const ProfileModal = ({ setShowEdit }) => {
-  const user = dummyUserData;
+  const user = useSelector((state) => state.user.value);
+
+  const dispatch = useDispatch();
+
+  const { getToken } = useAuth();
+
   const [editForm, setEditForm] = useState({
     username: user.username,
     bio: user.bio,
@@ -15,6 +24,32 @@ const ProfileModal = ({ setShowEdit }) => {
 
   const handleSaveProfile = async (e) => {
     e.preventDefault();
+    try {
+      const userData = new FormData();
+      const {
+        full_name,
+        username,
+        bio,
+        location,
+        profile_picture,
+        cover_photo,
+      } = editForm;
+      userData.append("username", username);
+      userData.append("bio", bio);
+      userData.append("location", location);
+      userData.append("full_name", full_name);
+      profile_picture && userData.append("profile", profile_picture);
+      cover_photo && userData.append("cover", cover_photo);
+
+      const token = await getToken();
+      console.log(userData)
+      await dispatch(updateUser({ userData, token }));
+
+      setShowEdit(false);
+    } catch (err) {
+      console.log(err);
+      toast.error(err.message);
+    }
   };
 
   return (
@@ -25,7 +60,16 @@ const ProfileModal = ({ setShowEdit }) => {
             Edit Profile
           </h1>
 
-          <form className="space-y-4" onSubmit={handleSaveProfile}>
+          <form
+            className="space-y-4"
+            onSubmit={(e) => {
+              toast.promise(handleSaveProfile(), {
+                loading: "Saving Changes...",
+                success: "Profile updated!",
+                error: "Failed to update profile",
+              });
+            }}
+          >
             {/* Profile Picture */}
             <div>
               <label
@@ -125,7 +169,7 @@ const ProfileModal = ({ setShowEdit }) => {
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
-                Username
+                Bio
               </label>
               <textarea
                 row={3}

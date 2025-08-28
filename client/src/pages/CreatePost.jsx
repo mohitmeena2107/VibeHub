@@ -2,16 +2,59 @@ import React, { useState } from "react";
 import { dummyUserData } from "../assets/assets";
 import { Image, X } from "lucide-react";
 import toast from "react-hot-toast";
+import { useSelector } from "react-redux";
+import {useAuth} from '@clerk/clerk-react'
+import api from "../api/axios.js";
+import {useNavigate} from 'react-router-dom'
 
 const CreatePost = () => {
+  const navigate = useNavigate()
+  const user = useSelector((state) => state.user.value);
   const [content, setContent] = useState("");
   const [loading, setLoading] = useState(false);
   const [images, setImages] = useState([]);
 
+  const {getToken} = useAuth()
+
   const handleSubmit = async () => {
-    console.log('click')
+    if(!images.length &&!content){
+      console.log('Please add an Image or Content')
+      return toast.error('Please add an Image or Content')
+    }
+     setLoading(true);
+
+     const post_type = images.length &&content?'text_with_image':images.length?'image':'text'
+
+     try{
+      const formData = new FormData()
+      formData.append('content',content)
+      formData.append('post_type',post_type)
+      images.map((image)=>formData.append('images',image));
+
+      const {data} = await api.post('api/v1/post/add',formData, {
+        headers:{
+          Authorization:`Bearer ${await getToken()}`
+        }
+      })
+
+      if(data.success){
+        navigate('/')
+      }
+      else{
+        console.log(data.message);
+        throw new Error(data.message)
+      }
+
+     }
+     catch(error){
+      console.log(error.message)
+      throw new Error(error.message)
+     }
+     setLoading(false)
   };
-  const user = dummyUserData;
+
+  
+
   return (
     <div className="min-h-screen bg-gradient-to-b from-slate-50 to-white">
       <div className="max-w-6x1 mx-auto p-6">
@@ -32,7 +75,7 @@ const CreatePost = () => {
               className="w-12 h-12 rounded-full shadow"
             />
             <div>
-              <h2 className="font-semibold">{user.fullname}</h2>
+              <h2 className="font-semibold">{user.full_name}</h2>
               <p className="text-sm text-gray-500">@{user.username}</p>
             </div>
           </div>
