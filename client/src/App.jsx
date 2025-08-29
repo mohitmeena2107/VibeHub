@@ -13,6 +13,7 @@ import Layout from "./pages/Layout";
 import { useEffect } from "react";
 import { useDispatch } from "react-redux";
 import { fetchUser } from "./features/users/userSlice";
+import { fetchConnections } from "./features/connections/connectionsSlice";
 
 const App = () => {
   const { user } = useUser();
@@ -24,6 +25,7 @@ const App = () => {
     if (user) {
       const token = await getToken();
       dispatch(fetchUser(token));
+      dispatch(fetchConnections(token));
     }
   };
   fetchData();

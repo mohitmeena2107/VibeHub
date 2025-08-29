@@ -1,6 +1,6 @@
 import {configureStore} from "@reduxjs/toolkit"
 import userReducer from "../features/users/userSlice.js"
-import connectionsReducer from "../features/connections/connectionSlice.js"
+import connectionsReducer from "../features/connections/connectionsSlice.js"
 import messagesReducer from "../features/messages/messagesSlice.js"
 
 

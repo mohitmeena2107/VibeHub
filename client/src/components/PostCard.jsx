@@ -1,8 +1,11 @@
-import React, {useState} from "react";
+import React, { useState } from "react";
 import { BadgeCheck, Heart, MessageCircle, Share2 } from "lucide-react";
 import moment from "moment";
 import { dummyUserData } from "../assets/assets";
 import { useSelector } from "react-redux";
+import { useAuth } from "@clerk/clerk-react";
+import api from "../api/axios.js";
+
 
 const PostCard = ({ post }) => {
   const postWithHashtags = post.content.replace(
@@ -11,13 +14,35 @@ const PostCard = ({ post }) => {
   );
   const [likes, setLikes] = useState(post.likes_count);
 
+  const currentUser = useSelector((state) => state.user.value);
 
-  const currentUser = useSelector((state)=>{
-    return state.user.value
-  });
+  const { getToken } = useAuth();
   const handleLike = async () => {
+    try {
+      const { data } = await api.post("api/v1/post/like",{postId:post._id}, {
+        headers: {
+          Authorization: `Bearer ${await getToken()}`,
+        },
+      });
 
-  }
+      if (data.success) {
+        setLikes(prev=>{
+          if(prev.includes(currentUser._id)){
+            return prev.filter(id=>id !== currentUser._id)
+          }
+          else{
+            return [...prev,currentUser._id]
+          }
+        });
+      } else {
+        console.log(data.message);
+        throw new Error(data.message);
+      }
+    } catch (error) {
+      console.log(error.message);
+      throw new Error(error.message);
+    }
+  };
   return (
     <div className="bg-white rounded-xl shadow p-4 space-y-4 w-full max-w-2xl">
       {/* User Info */}
@@ -60,7 +85,7 @@ const PostCard = ({ post }) => {
       </div>
       {/* Actions */}
       <div className="flex items-center gap-4 text-gray-600 text-sm pt-2 border-t border-gray-300">
-        <div className='flex items-center gap-1'>
+        <div className="flex items-center gap-1">
           <Heart
             className={`w-4 h-4 cursor-pointer ${
               likes.includes(currentUser._id) && "text-red-500 fill-red-500"
@@ -69,16 +94,12 @@ const PostCard = ({ post }) => {
           />
           <span>{likes.length}</span>
         </div>
-        <div className='flex items-center gap-1'>
-          <MessageCircle
-            className="w-4 h-4"
-          />
+        <div className="flex items-center gap-1">
+          <MessageCircle className="w-4 h-4" />
           <span>{7}</span>
         </div>
-        <div className='flex items-center gap-1'>
-          <Share2
-            className="w-4 h-4"
-          />
+        <div className="flex items-center gap-1">
+          <Share2 className="w-4 h-4" />
           <span>{7}</span>
         </div>
       </div>

@@ -3,14 +3,37 @@ import { Loading } from "../components/Loading";
 import StoryBar from "../components/StoryBar";
 import { assets, dummyPostsData } from "../assets/assets";
 import PostCard from "../components/PostCard";
-import RecentMessages from "../components/RecentMessages"
+import RecentMessages from "../components/RecentMessages";
+import { useAuth } from "@clerk/clerk-react";
+import api from "../api/axios";
 
 const Feed = () => {
   const [feeds, setFeeds] = useState([]);
   const [loading, setLoading] = useState(true);
 
+  const { getToken } = useAuth();
+
   const fetchFeed = async () => {
-    setFeeds(dummyPostsData);
+    setLoading(true);
+    try {
+      const { data } = await api.get("api/v1/post/feed", {
+        headers: {
+          Authorization: `Bearer ${await getToken()}`,
+        },
+      });
+
+      if (data.success) {
+        setFeeds(data.posts)
+      } else {
+        console.log(data.message);
+        throw new Error(data.message);
+      }
+
+
+    } catch (error) {
+      console.log(error.message);
+      throw new Error(error.message);
+    }
     setLoading(false);
   };
 
@@ -44,7 +67,7 @@ const Feed = () => {
             built for results.
           </p>
         </div>
-        <RecentMessages/>
+        <RecentMessages />
       </div>
     </div>
   ) : (

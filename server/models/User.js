@@ -10,9 +10,9 @@ const userSchema = new Schema(
     profile_picture: { type: String, default: "" },
     cover_photo: { type: String, default: "" },
     location: { type: String, default: "" },
-    followers: [{ type: Schema.Types.ObjectId, ref: "User" }],
-    following: [{ type: Schema.Types.ObjectId, ref: "User" }],
-    connections: [{ type: Schema.Types.ObjectId, ref: "User" }],
+    followers: [{ type: String, ref: "User" }],
+    following: [{ type: String, ref: "User" }],
+    connections: [{ type: String, ref: "User" }],
   },
   { timestamps: true, minimize: false }
 );

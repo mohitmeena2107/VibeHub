@@ -1,19 +1,82 @@
 import React, { useRef, useState, useEffect } from 'react'
 import { dummyMessagesData, dummyUserData } from '../assets/assets'
 import { ImageIcon, SendHorizonal, SendHorizontal } from 'lucide-react'
+import { connect, useDispatch, useSelector } from 'react-redux'
+import { useParams } from 'react-router-dom'
+import { useAuth } from '@clerk/clerk-react'
+import { addMessage, fetchMessages, recentMessages } from '../features/messages/messagesSlice'
+import api from '../api/axios'
+import {toast} from 'react-hot-toast';
 
 const ChatBox = () => {
+  const {connections} = useSelector((state)=>state.connections)
+  const {messages} = useSelector((state)=>state.messages)
+  const {userId} = useParams()
+  const {getToken} = useAuth()
+  const dispatch = useDispatch()
 
-  const messages = dummyMessagesData
   const [text,setText] = useState('')
   const [image,setImage] = useState(null)
-  const [user,setUser] = useState(dummyUserData)
+  const [user,setUser] = useState(null)
   const messagesEndRef = useRef(null)
 
-  const sendMessage = async()=>{
+  const fetchUserMessages=async ()=>{
+    try{
+      const token = await getToken()
+      dispatch(fetchMessages({token,userId}))
 
+    }catch(error){
+      console.log(error.message)
+    }
+  }
+  const sendMessage = async()=>{
+    if(!text && !image) return
+
+    let formData = new FormData();
+    formData.append("to_user_id", userId);
+    formData.append("text", text);
+    image && formData.append("image", image);
+    try{
+      const {data} = await api.post('/api/v1/message/send',formData,{
+      headers:{
+        Authorization:`Bearer ${await getToken()}`,
+      }
+    })
+
+    console.log(data)
+    if(data.success){
+      setText('')
+      setImage(null)
+      toast.success(data.message)
+      dispatch(addMessage(data.message))
+    }
+    else{
+      console.log(data.message)
+      toast.error(data.message)
+    }
+    }
+    catch(error){
+      console.log(error.message)
+      toast.error(error.message)
+    }
   }
   
+
+  useEffect(()=>{
+    if(connections.length>0){
+      const user = connections.find(connection=>connection._id===userId)
+      setUser(user)
+    }
+  },[connections,userId])
+
+
+  useEffect(()=>{
+    fetchUserMessages()
+    return ()=>{
+      dispatch(recentMessages())
+    }
+  },[userId])
+
   useEffect(()=>{
     messagesEndRef.current?.scrollIntoView({behavior:"smooth"})
   },[messages])
