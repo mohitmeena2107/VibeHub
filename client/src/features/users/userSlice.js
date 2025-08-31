@@ -10,7 +10,6 @@ export const fetchUser = createAsyncThunk("user/fetchUser", async (token) => {
   const { data } = await api.get("/api/v1/user/data", {
     headers: { Authorization: `Bearer ${token}` },
   });
-  console.log("FETCH USER RESPONSE:", data);
   return data.success ? data.user : null;
 });
 

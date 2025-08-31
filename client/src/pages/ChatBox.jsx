@@ -9,7 +9,7 @@ import api from '../api/axios'
 import {toast} from 'react-hot-toast';
 
 const ChatBox = () => {
-  const {connections} = useSelector((state)=>state.connections)
+  const connections = useSelector((state)=>state.connections.connections)
   const {messages} = useSelector((state)=>state.messages)
   const {userId} = useParams()
   const {getToken} = useAuth()
@@ -47,17 +47,14 @@ const ChatBox = () => {
     if(data.success){
       setText('')
       setImage(null)
-      toast.success(data.message)
       dispatch(addMessage(data.message))
     }
     else{
       console.log(data.message)
-      toast.error(data.message)
     }
     }
     catch(error){
-      console.log(error.message)
-      toast.error(error.message)
+      console.log(error.message) 
     }
   }
   

@@ -6,19 +6,20 @@ const initialState = {
 };
 
 export const fetchMessages = createAsyncThunk(
-  'messages/fetchMessages',
+  "messages/fetchMessages",
   async ({ token, userId }) => {
-    const { data } = await api.get('/api/v1/message/get', {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-      params: { to_user_id: userId },
-    });
-    console.log(data);
+    const { data } = await api.post(
+      "/api/v1/message/get",
+      { to_user_id: userId },
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
     return data.success ? data : null;
   }
 );
-
 
 const messagesSlice = createSlice({
   name: "messages",

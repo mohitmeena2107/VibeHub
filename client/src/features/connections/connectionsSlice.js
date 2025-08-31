@@ -15,7 +15,6 @@ export const fetchConnections = createAsyncThunk('connections/fetchConnections',
         Authorization:`Bearer ${token}`,
       }
     })
-    console.log(data);
     return data.success? data:null;
   }
 )
