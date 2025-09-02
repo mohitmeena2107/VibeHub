@@ -51,8 +51,6 @@ const Profile = () => {
       fetchUser(currentUser._id);
     }
     setUser(dummyUserData)
-    console.log("profileId:", profileId);
-    console.log("currentUser:", currentUser);
     setPosts(dummyPostsData)
 
   }, [profileId, currentUser]);

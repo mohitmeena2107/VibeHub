@@ -15,6 +15,8 @@ import { useDispatch } from "react-redux";
 import { fetchUser } from "./features/users/userSlice";
 import { fetchConnections } from "./features/connections/connectionsSlice";
 import { addMessage } from "./features/messages/messagesSlice";
+import socket from "../socket";
+
 
 const App = () => {
   const { user } = useUser();
@@ -38,29 +40,34 @@ const App = () => {
     pathref.current = pathname;
   }, [pathname]);
 
-  useEffect(() => {
-    if (user) {
-      const esource = new EventSource(
-        import.meta.env.VITE_BASE_URL + "/api/v1/message/" + user.id
-      );
-      esource.onmessage = (event)=>{
-        const message = JSON.parse(event.data)
 
-        if(pathref.current === ('/messages/'+message.from_user_id._id)){
-          dispatch(addMessage(message));
-        }
-        else{
+useEffect(() => {
+  if (user) {
+    // register user when logged in
+    socket.emit("register", user.id);
 
-        }
+    socket.on("receiveMessage", (message) => {
+      if (
+        pathref.current === "/messages/" + message.from_user_id._id ||
+        pathref.current === "/messages/" + message.to_user_id
+      ) {
+        dispatch(addMessage(message)); // update Redux in real-time
+      } else {
+        // show notification if needed
       }
-      return ()=>{
-        esource.close();
-      }
-    }
-  }, [user, dispatch]);
+    });
+
+    return () => {
+      socket.off("receiveMessage");
+    };
+  }
+}, [user, dispatch]);
+
+
 
   return (
     <>
+
       <Routes>
         <Route path="/" element={!user ? <Login /> : <Layout />}>
           <Route index element={<Feed />} />
@@ -73,6 +80,7 @@ const App = () => {
           <Route path="profile/:profileId" element={<Profile />} />
         </Route>
       </Routes>
+
     </>
   );
 };

@@ -47,7 +47,6 @@ const ChatBox = () => {
     if(data.success){
       setText('')
       setImage(null)
-      dispatch(addMessage(data.message))
     }
     else{
       console.log(data.message)
