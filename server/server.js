@@ -5,7 +5,7 @@ import connectDB from "./db/index.js";
 import {Server} from "socket.io"
 import { verifyToken } from "@clerk/backend";
 
-const clerk = Clerk({ secretKey: process.env.CLERK_SECRET_KEY });
+// const clerk = Clerk({ secretKey: process.env.CLERK_SECRET_KEY });
 
 const PORT = process.env.PORT || 4000;
 
