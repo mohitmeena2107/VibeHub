@@ -52,3 +52,4 @@ connectDB()
   .catch((err) => console.log("MONGO db connection failed !!! ", err));
 
 export { io };
+export default server;
