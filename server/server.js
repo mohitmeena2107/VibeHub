@@ -3,7 +3,9 @@ import {createServer} from "http"
 import { app } from "./app.js";
 import connectDB from "./db/index.js";
 import {Server} from "socket.io"
+import { Clerk } from "@clerk/backend";
 
+const clerk = Clerk({ secretKey: process.env.CLERK_SECRET_KEY });
 
 const PORT = process.env.PORT || 4000;
 
@@ -15,6 +17,26 @@ const io = new Server(server, {
     methods: ["GET", "POST"],
     credentials: true,
   },
+});
+
+io.use(async (socket, next) => {
+  try {
+    const token = socket.handshake.auth.token;
+
+    if (!token) {
+      return next(new Error("Unauthorized: No token"));
+    }
+
+    // Verify Clerk session token
+    const sessionClaims = await clerk.verifyToken(token);
+
+    // Attach user info to socket
+    socket.user = sessionClaims;
+    next();
+  } catch (err) {
+    console.error("Socket auth failed:", err.message);
+    next(new Error("Unauthorized"));
+  }
 });
 
 const onlineUsers = new Map();
