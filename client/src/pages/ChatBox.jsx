@@ -6,7 +6,6 @@ import { useParams } from 'react-router-dom'
 import { useAuth } from '@clerk/clerk-react'
 import { addMessage, fetchMessages, recentMessages } from '../features/messages/messagesSlice'
 import api from '../api/axios'
-import {toast} from 'react-hot-toast';
 
 const ChatBox = () => {
   const connections = useSelector((state)=>state.connections.connections)

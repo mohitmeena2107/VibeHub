@@ -43,7 +43,6 @@ const App = () => {
 
 useEffect(() => {
   if (user) {
-    // register user when logged in
     socket.emit("register", user.id);
 
     socket.on("receiveMessage", (message) => {

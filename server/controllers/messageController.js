@@ -5,7 +5,7 @@ import Message from "../models/Message.js";
 // Send a message
 export const sendMessage = async (req, res) => {
   try {
-    const { userId } = req.auth; // ✅ not a function
+    const { userId } = req.auth; 
     const { to_user_id, text } = req.body;
     const image = req.file;
 
@@ -83,7 +83,7 @@ export const getChatMessages = async (req, res) => {
 // Get recent messages for logged-in user
 export const getUserRecentMessages = async (req, res) => {
   try {
-    const { userId } = req.auth; // ✅ fixed
+    const { userId } = req.auth; 
 
     const messages = await Message.find({ to_user_id: userId })
       .populate("from_user_id to_user_id")

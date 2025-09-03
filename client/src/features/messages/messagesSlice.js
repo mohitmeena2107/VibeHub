@@ -21,15 +21,24 @@ export const fetchMessages = createAsyncThunk(
   }
 );
 
+const normalizeMessage = (msg) => ({
+  ...msg,
+  from_user_id:
+    typeof msg.from_user_id === "object" ? msg.from_user_id._id : msg.from_user_id,
+  to_user_id:
+    typeof msg.to_user_id === "object" ? msg.to_user_id._id : msg.to_user_id,
+});
+
 const messagesSlice = createSlice({
   name: "messages",
   initialState,
   reducers: {
     setMessages: (state, action) => {
-      state.messages = action.payload;
+      state.messages = action.payload.map(normalizeMessage);
     },
     addMessage: (state, action) => {
-      state.messages = [...state.messages, action.payload];
+      const normalized = normalizeMessage(action.payload);
+      state.messages = [...state.messages, normalized];
     },
     recentMessages: (state) => {
       state.messages = [];
@@ -38,11 +47,12 @@ const messagesSlice = createSlice({
   extraReducers: (builder) => {
     builder.addCase(fetchMessages.fulfilled, (state, action) => {
       if (action.payload) {
-        state.messages = action.payload.messages;
+        state.messages = action.payload.messages.map(normalizeMessage);
       }
     });
   },
 });
-export const { setMessages, addMessage, recentMessages } =
-  messagesSlice.actions;
+
+export const { setMessages, addMessage, recentMessages } = messagesSlice.actions;
+
 export default messagesSlice.reducer;
