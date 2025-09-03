@@ -20,6 +20,14 @@ app.use(
 app.use(express.json({limit: "16kb"}))
 app.use(express.urlencoded({extended: true, limit: "16kb"}))
 app.use(express.static("public"))
+// Before clerkMiddleware
+app.use((req, res, next) => {
+  if (req.path.startsWith("/socket.io/")) {
+    return next(); // bypass Clerk for Socket.IO
+  }
+  return clerkMiddleware()(req, res, next);
+});
+
 app.use(clerkMiddleware())
 app.use("/api/inngest", serve({ client: inngest, functions }))
 
