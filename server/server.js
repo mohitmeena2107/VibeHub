@@ -3,7 +3,7 @@ import {createServer} from "http"
 import { app } from "./app.js";
 import connectDB from "./db/index.js";
 import {Server} from "socket.io"
-import { Clerk } from "@clerk/backend";
+import { verifyToken } from "@clerk/backend";
 
 const clerk = Clerk({ secretKey: process.env.CLERK_SECRET_KEY });
 
@@ -24,17 +24,20 @@ io.use(async (socket, next) => {
     const token = socket.handshake.auth.token;
 
     if (!token) {
-      return next(new Error("Unauthorized: No token"));
+      return next(new Error("Unauthorized: No token provided"));
     }
 
-    // Verify Clerk session token
-    const sessionClaims = await clerk.verifyToken(token);
+    // Verify Clerk token
+    const { sub, ...claims } = await verifyToken(token, {
+      secretKey: process.env.CLERK_SECRET_KEY,
+    });
 
-    // Attach user info to socket
-    socket.user = sessionClaims;
+    // Attach user info (sub = Clerk userId)
+    socket.user = { id: sub, ...claims };
+
     next();
   } catch (err) {
-    console.error("Socket auth failed:", err.message);
+    console.error("❌ Clerk token verification failed:", err.message);
     next(new Error("Unauthorized"));
   }
 });
